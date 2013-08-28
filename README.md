@@ -1,6 +1,6 @@
 # mojito-dimensions-base
 
-A-B _a.k.a. bucket_ testing infrastructure for mojito applications.
+A-B _(a.k.a. bucket)_ testing infrastructure for mojito applications.
 
 The Super Bundle RS Addon is a mojito [resource store addon][rs-addon] to discover, load and auto-configure resources from experiments `super-bundle` packages.
 
@@ -8,7 +8,7 @@ The Super Bundle RS Addon is a mojito [resource store addon][rs-addon] to discov
 
 ## Super Bundles
 
-Experiments `super-bundle` packages are special types of mojito `bundles`, wich contain multiple versions of mojits that can be chosen at runtime though the dimension values using mojito `selectors` infrastructure.
+Experiments `super-bundle` packages are special types of mojito `bundles`, wich contain multiple versions of mojits that can be chosen at runtime through the dimension values using mojito `selectors` infrastructure.
 
 ### Contexts and dimensions
 
