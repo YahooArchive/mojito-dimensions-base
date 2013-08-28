@@ -1,0 +1,11 @@
+{
+    "name": "test-dimensions-experiment_ad",
+    "version": "0.0.1",
+    "dependencies": {
+    },
+    "yahoo": {
+        "mojito": {
+            "type": "super-bundle"
+        }
+    }
+}

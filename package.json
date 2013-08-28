@@ -1,0 +1,38 @@
+{
+    "name": "mojito-dimensions-base",
+    "description": "Mojito bucket testing infrastrcture Super Bundle Addon",
+    "version": "0.0.1",
+    "author": "David Gomez <dgomez@yahoo-inc.com>",
+    "contributors": [
+        "Jacques Arnoux <arnoux@yahoo-inc.com>",
+        "David Gomez <dgomez@yahoo-inc.com>"
+    ],
+    "engines": {
+        "node": "> 0.10",
+        "npm": "> 1.2",
+        "mojito": ">=0.7.3"
+    },
+    "devDependencies": {
+        "mojito": ">=0.7.3",
+        "mojito-cli": "0.1.x"
+    },
+    "scripts": {
+        "pretest": "mojito jslint app",
+        "test": "istanbul cover --yui=true --dir=artifacts/test/coverage ./node_modules/.bin/mojito -- test app .",
+        "posttest": "istanbul check-coverage --statements 80 --branches 80 --lines 80 --functions 80"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/yahoo/mojito-dimensions-base.git"
+    },
+    "bugs": "https://github.com/yahoo/mojito-dimensions-base/issues",
+    "licenses":[{
+        "type" : "BSD",
+        "url" : "https://github.com/yahoo/mojito-dimensions-base/blob/master/LICENSE.txt"
+    }],
+    "yahoo": {
+        "mojito": {
+            "type": "bundle"
+        }
+    }
+}
