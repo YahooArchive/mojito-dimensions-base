@@ -1,5 +1,13 @@
 # mojito-dimensions-base
 
+Build Status
+------------
+
+[![Build Status](https://travis-ci.org/yahoo/mojito-dimensions-base.png)](https://travis-ci.org/yahoo/mojito-dimensions-base)
+
+Usage
+-----
+
 A-B _(a.k.a. bucket)_ testing infrastructure for mojito applications.
 
 The Super Bundle RS Addon is a mojito [resource store addon][rs-addon] to discover, load and auto-configure resources from experiments `super-bundle` packages.

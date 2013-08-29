@@ -14,7 +14,8 @@
     },
     "devDependencies": {
         "mojito": ">=0.7.3",
-        "mojito-cli": "0.1.x"
+        "mojito-cli": "0.1.x",
+        "istanbul": "0.1.x"
     },
     "scripts": {
         "pretest": "mojito jslint app",
