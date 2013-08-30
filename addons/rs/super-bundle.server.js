@@ -10,7 +10,6 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
     "use strict";
 
     var libfs = require('fs'),
-        libyub = require('yub'),
         libpath = require('path'),
         liburl = require('url'),
 
