@@ -156,6 +156,7 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
             this.beforeHostMethod('preloadResourceVersions', this.hookConfigPlugin, this);
             this.beforeHostMethod('addResourceVersion', this.addResourceVersion, this);
             this.afterHostMethod('parseResourceVersion', this.parseResourceVersion, this);
+            this.onHostEvent('resolveMojitDetails', this.resolveMojitDetails, this);
         },
 
         /**
@@ -265,7 +266,8 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
                             version: info.pkg.version,
                             depth: info.depth,
                             type: 'super-bundle',
-                            bundleName: subdir
+                            dimension: dimensionName,
+                            bundle: subdir
                         };
                         self.store._preloadDirBundle(path, pkg);
                         // and add the new dimension value to the dimension definition
@@ -300,7 +302,7 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
                 idx;
 
             if (source.pkg.type === 'super-bundle') {
-                bundleSelector = source.pkg.bundleName;
+                bundleSelector = source.pkg.bundle;
                 res.selector = (res.selector === '*') ? bundleSelector : bundleSelector + '_' + res.selector;
 
                 if ('asset' === type) {
@@ -329,8 +331,22 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
          */
         addResourceVersion: function (res) {
             if (res.type === 'mojit' && res.source.pkg.type === 'super-bundle') {
-                res.selector = res.source.pkg.bundleName;
+                res.selector = res.source.pkg.bundle;
 	        }
+        },
+
+        /**
+         * Add dimension info to the mojit resource details
+         */
+        resolveMojitDetails: function (event) {
+            var mojitRes = event.args.mojitRes,
+                mojitDetails = event.mojitDetails,
+                pkg = mojitRes.source.pkg;
+
+            if (pkg.type === 'super-bundle') {
+                mojitDetails.dimensionName = pkg.dimension;
+                mojitDetails.dimensionValue = pkg.bundle;
+            }
         },
 
         /**
