@@ -17,8 +17,8 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
         OA = YUITest.ObjectAssert,
         suite,
 
-        superBundleDim = 'experiment_ad',
-        superBundleName = 'test-dimensions-' + superBundleDim,
+        superBundleDimension = 'experiment_ad',
+        superBundleName = 'test-dimensions-' + superBundleDimension,
         superBundlePath = libpath.join(__dirname, 'fixtures', superBundleName),
 
         store,
@@ -54,7 +54,8 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
                 "version": "0.0.1",
                 "depth": 1,
                 "type": "super-bundle",
-                "bundleName": "blue"
+                "bundle": "blue",
+                "dimension": superBundleDimension
             }
         },
 
@@ -96,7 +97,8 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
                 lang: { 'es-MX': true },
                 device: { iphone: true }
             };
-            this._validDims[superBundleDim] = true;
+            this._validDims[superBundleDimension] = true;
+            this.publish('resolveMojitDetails', {emitFacade: true, preventable: false});
         },
 
         _preloadPackage: function (info) {
@@ -133,6 +135,22 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
 
         addResourceVersion: function (res) {
             //to be tested on addon (plugin)
+        },
+
+        resolveMojitDetails: function (env, posl, type, ress, mojitRes) {
+            var details = {};
+            //should trigger RSAddonSuperBundle.resolveMojitDetails through AOP
+            this.fire('resolveMojitDetails', {
+                args: {
+                    env: env,
+                    posl: posl,
+                    type: type,
+                    ress: ress,
+                    mojitRes: mojitRes
+                },
+                mojitDetails: details
+            });
+            return details;
         }
     });
 
@@ -223,21 +241,21 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
             dimensions.forEach(function (name) {
                 var path = libpath.join(superBundlePath, name);
                 OA.ownsKey(path, store._dirBundlesLoaded, 'Bundle loaded');
-                A.areEqual(name, store._dirBundlesLoaded[path].bundleName, 'Bundle name');
+                A.areEqual(name, store._dirBundlesLoaded[path].bundle, 'Bundle name');
             });
         },
 
         'test parseResourceVersion': function () {
             var res = store.parseResourceVersion(source, type, subtype, mojitType);
 
-            A.areEqual(source.pkg.bundleName, res.selector, "Dynamic selector");
+            A.areEqual(source.pkg.bundle, res.selector, "Dynamic selector");
             A.areEqual("/test_static_prefix/TestMojit/assets/testMojit-base.blue.css",
                 res.url, "Resource static url");
         },
 
         'test parseResourceVersion with composite selector': function () {
             var testSelector = 'TEST',
-                expectedSelector = source.pkg.bundleName + '_' + testSelector,
+                expectedSelector = source.pkg.bundle + '_' + testSelector,
                 res = store.parseResourceVersion(source, type, subtype, mojitType, testSelector);
 
             A.areEqual(expectedSelector, res.selector, "Dynamic selector");
@@ -251,14 +269,14 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
             source.fs.fullPath = source.fs.fullPath.replace('.css', '.iphone.css');
             res = store.parseResourceVersion(source, type, subtype, mojitType);
 
-            A.areEqual(source.pkg.bundleName, res.selector, "Dynamic selector");
+            A.areEqual(source.pkg.bundle, res.selector, "Dynamic selector");
             A.areEqual("/test_static_prefix/TestMojit/assets/testMojit-base.iphone.blue.css",
                 res.url, "Resource static url");
         },
 
         'test parseResourceVersion with exising composite selector': function () {
             var testSelector = 'TEST',
-                expectedSelector = source.pkg.bundleName + '_' + testSelector,
+                expectedSelector = source.pkg.bundle + '_' + testSelector,
                 res = store.parseResourceVersion(source, type, subtype, mojitType, testSelector);
 
             A.areEqual(expectedSelector, res.selector, "Dynamic selector");
@@ -318,7 +336,9 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
             var ctx = {
                     experiment_ad: 'invalid',
                     lang: 'es-MX',
-                    langs: 'foo'
+                    langs: 'foo',
+                    //should be ignored
+                    foo: null
                 },
 
                 orig = Y.log,
@@ -357,12 +377,12 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
                 source: {
                     pkg: {
                         type: 'super-bundle',
-                        bundleName: 'blue_1'
+                        bundle: 'blue_1'
                     }
                 }
             };
             store.addResourceVersion(res);
-            A.areEqual(res.source.pkg.bundleName, res.selector, 'Resource selector');
+            A.areEqual(res.source.pkg.bundle, res.selector, 'Resource selector');
         },
 
         'test addResourceVersion with regular pkg': function () {
@@ -377,6 +397,20 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
             };
             store.addResourceVersion(res);
             A.areEqual('foo', res.selector, 'Resource selector');
+        },
+
+        'resolveMojitDetails should add dimension name and value to mojit details': function () {
+            var env = {},
+                posl = {},
+                type = "FooMojit",
+                ress = [],
+                mojitRes = {
+                    source: source
+                },
+                details = store.resolveMojitDetails(env, posl, type, ress, mojitRes);
+
+            A.areEqual(source.pkg.dimension, details.dimensionName, "Mojit details dimension name");
+            A.areEqual(source.pkg.bundle, details.dimensionValue, "Mojit details dimension value");
         }
     }));
 
