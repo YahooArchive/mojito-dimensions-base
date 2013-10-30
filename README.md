@@ -16,7 +16,7 @@ The Super Bundle RS Addon is a mojito [resource store addon][rs-addon] to discov
 
 ## Super Bundles
 
-Experiments `super-bundle` packages are special types of mojito `bundles`, wich contain multiple versions of mojits that can be chosen at runtime through the dimension values using mojito `selectors` infrastructure.
+Experiments `super-bundle` packages are special types of mojito `bundles`, which contain multiple versions of mojits that can be chosen at runtime through the dimension values using mojito `selectors` infrastructure.
 
 ### Contexts and dimensions
 
@@ -29,7 +29,7 @@ The dimension name must be in the format: `experiment_<name>`
 Consider the base application `my-mojito-app` which contains `Mojit1`.
 
 We create an experiment _super-bundle_ package `mojito-dimensions-experiment_foo`,
-which contains multipe versions of `Mojit1` based on the value of the dimension the package represents.
+which contains multiple versions of `Mojit1` based on the value of the dimension the package represents.
 
 Consider for the pupose of the example a layer named `foo`, whose values can be `EXP001, EXP002, EXP003`.
 
