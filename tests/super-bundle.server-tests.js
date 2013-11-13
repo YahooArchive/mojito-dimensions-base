@@ -226,7 +226,6 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
 
         _should: {
             error: {
-                'validateContext with invalid dimension should fail': 'INVALID dimension key "experiment_foo"',
                 'validateContext with invalid dimension value should fail': 'INVALID dimension value "invalid" for key "device"',
                 'validateContext with invalid lang value should fail': 'INVALID dimension value "invalid" for key "lang"',
                 'validateContext with invalid cached value should fail': 'INVALID cached context'
@@ -243,6 +242,25 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
                 OA.ownsKey(path, store._dirBundlesLoaded, 'Bundle loaded');
                 A.areEqual(name, store._dirBundlesLoaded[path].bundle, 'Bundle name');
             });
+        },
+
+        'test preloadPackage with non-super-bundle package': function () {
+            var name = 'some-package',
+                pkgInfo = {
+                    pkg: {
+                        name: name,
+                        yahoo: {
+                            mojito: {
+                                type: 'bundle'
+                            }
+                        }
+                    }
+                },
+                path = libpath.join(superBundlePath, name);
+
+            store._preloadPackage(pkgInfo);
+            A.isUndefined(store._packagesVisited[name], 'Packages visited');
+            A.isUndefined(store._dirBundlesLoaded[path], 'Loaded bundle');
         },
 
         'test parseResourceVersion': function () {
@@ -317,9 +335,14 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
             AA.containsItems(expectedPaths, store.config._ycbAppConfig, 'Config plugin _ycbAppConfig');
         },
 
-        'validateContext with invalid dimension should fail': function () {
+        'validateContext with invalid dimension should fail with invalid request': function () {
             var invalidCtx = { experiment_foo: 'BAR'};
-            store.validateContext(invalidCtx);
+            try {
+                store.validateContext(invalidCtx);
+            } catch (err) {
+                A.areEqual('INVALID dimension key "experiment_foo"', err.message, 'Error message');
+                A.areEqual(400, err.code, 'Error code');
+            }
         },
 
         'validateContext with invalid lang value should fail': function () {
