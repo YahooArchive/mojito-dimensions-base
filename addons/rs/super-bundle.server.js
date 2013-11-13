@@ -173,7 +173,8 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
                 parts,
                 p,
                 test,
-                found;
+                found,
+                error;
 
             cacheValue = store._validateContextCache[cacheKey];
             if (cacheValue) {
@@ -194,7 +195,11 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
                     }
                     if (!store._validDims[k]) {
                         store._validateContextCache[cacheKey] = 'INVALID dimension key "' + k + '"';
-                        throw new Error(store._validateContextCache[cacheKey]);
+                        error = new Error(store._validateContextCache[cacheKey]);
+                        if (isExperimentDimension(k)) {
+                            error.code = 400; //bad request
+                        }
+                        throw error;
                     }
                     // we need to support language fallbacks
                     if ('lang' === k) {
