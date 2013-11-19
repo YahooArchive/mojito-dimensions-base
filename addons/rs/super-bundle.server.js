@@ -75,7 +75,7 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
         getDimensions: function () {
             var dims = this.host._ycbDims;
             if (!this.cookedDims) {
-                dims[0].dimensions = dims[0].dimensions.concat(dimensions);
+                dims[0].dimensions = dimensions.concat(dims[0].dimensions);
                 this.cookedDims = true;
             }
             return new Y.Do.AlterReturn(null, dims);
