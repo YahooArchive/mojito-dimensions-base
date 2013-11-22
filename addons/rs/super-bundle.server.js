@@ -45,7 +45,7 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
         appConfigs = [];
 
     /**
-     * Plugin for the mojito config RS addon to dynamically insert configruations and dimensions
+     * Plugin for the mojito config RS addon to dynamically insert configurations and dimensions
      */
     function ConfigPlugin() {
         ConfigPlugin.superclass.constructor.apply(this, arguments);
@@ -75,7 +75,9 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
         getDimensions: function () {
             var dims = this.host._ycbDims;
             if (!this.cookedDims) {
+                // adds the experiment dimensions to the existing app dimensions
                 dims[0].dimensions = dims[0].dimensions.concat(dimensions);
+                // dims[0].dimensions = dimensions.concat(dims[0].dimensions); // inverted
                 this.cookedDims = true;
             }
             return new Y.Do.AlterReturn(null, dims);
@@ -328,10 +330,10 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
         },
 
         /**
-         * Hande special case for resources type='mojit' (a.k.a. mojit directory),
+         * Handle special case for resources type='mojit' (a.k.a. mojit directory),
          * when multiple versions exist at the same package level (i.e. node_modules/dependency{1..n}
          * In this case, the app resource (type=mojit) selector will be set to the super-bundle selector
-         * instead of the default '*', so we can differenciate between the base mojit and the
+         * instead of the default '*', so we can differentiate between the base mojit and the
          * super-bundle mojit dirs.
          */
         addResourceVersion: function (res) {
