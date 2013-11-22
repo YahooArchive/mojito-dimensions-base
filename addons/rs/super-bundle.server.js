@@ -45,7 +45,7 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
         appConfigs = [];
 
     /**
-     * Plugin for the mojito config RS addon to dynamically insert configruations and dimensions
+     * Plugin for the mojito config RS addon to dynamically insert configurations and dimensions
      */
     function ConfigPlugin() {
         ConfigPlugin.superclass.constructor.apply(this, arguments);
@@ -301,23 +301,42 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
         parseResourceVersion: function (source, type, subtype, mojitType) {
             var res = Y.Do.currentRetVal,
                 bundleSelector,
+                originalSelector,
+                prefix,
                 fs,
                 relativePath,
                 urlParts,
-                idx;
+                idx,
+                explicitSelector = false;
 
             if (source.pkg.type === 'super-bundle') {
+                originalSelector = res.selector;
                 bundleSelector = source.pkg.bundle;
-                res.selector = (res.selector === '*') ? bundleSelector : bundleSelector + '_' + res.selector;
+                prefix = bundleSelector + '_';
+
+                if (originalSelector === '*') {
+                    res.selector = bundleSelector;
+                } else if (originalSelector !== bundleSelector && originalSelector.indexOf(prefix) !== 0) {
+                    res.selector = prefix + res.selector;
+                } else {
+                    explicitSelector = true;
+                }
 
                 if ('asset' === type) {
                     fs = source.fs;
                     relativePath = fs.fullPath.substr(fs.rootDir.length + 1);
                     urlParts = [liburl.resolve('/', (this.staticHandling.prefix || 'static'))];
 
-                    idx = relativePath.lastIndexOf('.');
-                    relativePath = relativePath.substring(0, idx) +
-                        '.' + bundleSelector + relativePath.substring(idx);
+                    if (!explicitSelector) {
+                        if (originalSelector === '*') {
+                            idx = relativePath.lastIndexOf('.');
+                            relativePath = relativePath.substring(0, idx) +
+                                '.' + bundleSelector + relativePath.substring(idx);
+                        } else {
+                            relativePath = relativePath.replace('.' + originalSelector + '.',
+                                '.' + res.selector + '.');
+                        }
+                    }
 
                     urlParts.push(res.mojit);
                     urlParts.push(relativePath);
@@ -328,10 +347,10 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
         },
 
         /**
-         * Hande special case for resources type='mojit' (a.k.a. mojit directory),
+         * Handle special case for resources type='mojit' (a.k.a. mojit directory),
          * when multiple versions exist at the same package level (i.e. node_modules/dependency{1..n}
          * In this case, the app resource (type=mojit) selector will be set to the super-bundle selector
-         * instead of the default '*', so we can differenciate between the base mojit and the
+         * instead of the default '*', so we can differentiate between the base mojit and the
          * super-bundle mojit dirs.
          */
         addResourceVersion: function (res) {
