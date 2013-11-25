@@ -5,6 +5,8 @@ Build Status
 
 [![Build Status](https://travis-ci.org/yahoo/mojito-dimensions-base.png)](https://travis-ci.org/yahoo/mojito-dimensions-base)
 
+[![NPM](https://nodei.co/npm/mojito-dimensions-base.png)](https://nodei.co/npm/mojito-dimensions-base/)
+
 Usage
 -----
 
