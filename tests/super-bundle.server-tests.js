@@ -37,27 +37,7 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
         type = 'asset',
         subtype = 'css',
         mojitType = 'TestMojit',
-
-        source = {
-            "fs": {
-                "fullPath": libpath.join(superBundlePath, "blue/mojits/TestMojit/assets/testMojit-base.css"),
-                "rootDir": libpath.join(superBundlePath, "blue/mojits/TestMojit"),
-                "rootType": "mojit",
-                "subDir": ".",
-                "subDirArray": [],
-                "isFile": true,
-                "ext": ".css",
-                "basename": "testMojit-base"
-            },
-            "pkg": {
-                "name": superBundleName,
-                "version": "0.0.1",
-                "depth": 1,
-                "type": "super-bundle",
-                "bundle": "blue",
-                "dimension": superBundleDimension
-            }
-        },
+        source,
 
         dimensions = ['blue', 'blue_1', 'blue_2'],
 
@@ -224,6 +204,29 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
 
         name: 'unit tests',
 
+        setUp: function () {
+            source = {
+                "fs": {
+                    "fullPath": libpath.join(superBundlePath, "blue/mojits/TestMojit/assets/testMojit-base.css"),
+                    "rootDir": libpath.join(superBundlePath, "blue/mojits/TestMojit"),
+                    "rootType": "mojit",
+                    "subDir": ".",
+                    "subDirArray": [],
+                    "isFile": true,
+                    "ext": ".css",
+                    "basename": "testMojit-base"
+                },
+                "pkg": {
+                    "name": superBundleName,
+                    "version": "0.0.1",
+                    "depth": 1,
+                    "type": "super-bundle",
+                    "bundle": "blue",
+                    "dimension": superBundleDimension
+                }
+            };
+        },
+
         _should: {
             error: {
                 'validateContext with invalid dimension value should fail': 'INVALID dimension value "invalid" for key "device"',
@@ -272,33 +275,39 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
         },
 
         'test parseResourceVersion with composite selector': function () {
-            var testSelector = 'TEST',
-                expectedSelector = source.pkg.bundle + '_' + testSelector,
-                res = store.parseResourceVersion(source, type, subtype, mojitType, testSelector);
+            var testSelector = 'blue_TEST',
+                res;
 
-            A.areEqual(expectedSelector, res.selector, "Dynamic selector");
-            A.areEqual("/test_static_prefix/TestMojit/assets/testMojit-base.blue.css",
+            source.fs.fullPath = source.fs.fullPath.replace('.css', '.blue_TEST.css');
+            res = store.parseResourceVersion(source, type, subtype, mojitType, testSelector);
+
+            A.areEqual(testSelector, res.selector, "Dynamic selector");
+            A.areEqual("/test_static_prefix/TestMojit/assets/testMojit-base.blue_TEST.css",
                 res.url, "Resource static url");
         },
 
         'test parseResourceVersion with existing selector': function () {
-            var res;
+            var testSelector = 'iphone',
+                expectedSelector = source.pkg.bundle + '_' + testSelector,
+                res;
 
             source.fs.fullPath = source.fs.fullPath.replace('.css', '.iphone.css');
-            res = store.parseResourceVersion(source, type, subtype, mojitType);
-
-            A.areEqual(source.pkg.bundle, res.selector, "Dynamic selector");
-            A.areEqual("/test_static_prefix/TestMojit/assets/testMojit-base.iphone.blue.css",
+            res = store.parseResourceVersion(source, type, subtype, mojitType, 'iphone');
+            A.areEqual(expectedSelector, res.selector, "Dynamic selector");
+            A.areEqual("/test_static_prefix/TestMojit/assets/testMojit-base.blue_iphone.css",
                 res.url, "Resource static url");
         },
 
         'test parseResourceVersion with exising composite selector': function () {
             var testSelector = 'TEST',
                 expectedSelector = source.pkg.bundle + '_' + testSelector,
-                res = store.parseResourceVersion(source, type, subtype, mojitType, testSelector);
+                res;
+
+            source.fs.fullPath = source.fs.fullPath.replace('.css', '.blue_TEST.css');
+            res = store.parseResourceVersion(source, type, subtype, mojitType, testSelector);
 
             A.areEqual(expectedSelector, res.selector, "Dynamic selector");
-            A.areEqual("/test_static_prefix/TestMojit/assets/testMojit-base.iphone.blue.css",
+            A.areEqual("/test_static_prefix/TestMojit/assets/testMojit-base.blue_TEST.css",
                 res.url, "Resource static url");
         },
 
