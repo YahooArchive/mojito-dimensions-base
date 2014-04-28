@@ -117,6 +117,38 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
             //to be tested on addon (plugin)
         },
 
+        getResourceVersions: function (filter) {
+            //to be tested on addon (plugin)
+            if (filter.selector === '*') {
+                return [];
+            }
+            return [{
+                source: {
+                    pkg: {
+                        depth: 2
+                    }
+                }
+            }, {
+                source: {
+                    pkg: {
+                        depth: 3
+                    }
+                }
+            }, {
+                source: {
+                    pkg: {
+                        depth: 1
+                    }
+                }
+            }, {
+                source: {
+                    pkg: {
+                        depth: 2
+                    }
+                }
+            }];
+        },
+
         resolveMojitDetails: function (env, posl, type, ress, mojitRes) {
             var details = {};
             //should trigger RSAddonSuperBundle.resolveMojitDetails through AOP
@@ -443,6 +475,22 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
 
             A.areEqual(source.pkg.dimension, details.dimensionName, "Mojit details dimension name");
             A.areEqual(source.pkg.bundle, details.dimensionValue, "Mojit details dimension value");
+        },
+
+        'getResourceVersions should return shallowest resource if mojit resource with * selector is not found' : function () {
+            var filter = {
+                    type: 'mojit',
+                    name: 'FooMojit',
+                    selector: '*'
+                },
+                versions = store.getResourceVersions(filter),
+                resource;
+
+            A.isArray(versions, 'resource versions');
+            A.areEqual(4, versions.length, 'versions length');
+            resource = versions[0];
+            A.isObject(resource, 'resource');
+            A.areEqual(1, resource.source.pkg.depth, 'resource package depth');
         }
     }));
 

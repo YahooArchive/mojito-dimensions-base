@@ -41,6 +41,14 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
             return name.indexOf(EXPERIMENT_DIMENSION_PREFIX) === 0;
         },
 
+        resourceDepthAsc = function (a, b) {
+            var da = a.source.pkg.depth,
+                db = b.source.pkg.depth;
+            if (da < db) { return -1; }
+            if (da > db) { return 1; }
+            return 0;
+        },
+
         dimensions = [],
         appConfigs = [];
 
@@ -155,6 +163,7 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
             this.beforeHostMethod('_preloadPackage', this._preloadPackage, this);
             this.beforeHostMethod('preloadResourceVersions', this.hookConfigPlugin, this);
             this.beforeHostMethod('addResourceVersion', this.addResourceVersion, this);
+            this.afterHostMethod('getResourceVersions', this.getResourceVersions, this);
             this.afterHostMethod('parseResourceVersion', this.parseResourceVersion, this);
             this.onHostEvent('resolveMojitDetails', this.resolveMojitDetails, this);
         },
@@ -287,6 +296,19 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
             }
         },
 
+        getResourceVersions: function (filter) {
+            var self = this,
+                res = Y.Do.currentRetVal,
+                versions;
+
+            if (filter.type === 'mojit' && filter.name !== 'shared' && filter.selector === '*' &&
+                    res.length === 0) {
+                res = self.store.getResourceVersions({ type: 'mojit', name: filter.name });
+                res.sort(resourceDepthAsc);
+            }
+            return new Y.Do.AlterReturn(null, res);
+        },
+
         /**
          * Hook in to replace the selector with the experiment bundle name.
          *
@@ -356,7 +378,7 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
         addResourceVersion: function (res) {
             if (res.type === 'mojit' && res.source.pkg.type === 'super-bundle') {
                 res.selector = res.source.pkg.bundle;
-	        }
+            }
         },
 
         /**
