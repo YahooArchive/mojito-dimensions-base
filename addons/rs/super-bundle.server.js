@@ -230,7 +230,9 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
                     if (!store._validDims[k][ctx[k]]) {
                         //this is the only difference with the host method...
                         if (isExperimentDimension(k)) {
-                            Y.log('INVALID dimension value "' + ctx[k] + '" for key "' + k + '"', 'error', NAME);
+                            Y.log('INVALID dimension value "' + ctx[k] + '" for key "' + k +
+                                '". Bucket "' + k.replace(EXPERIMENT_DIMENSION_PREFIX, '') + ':' + ctx[k] +
+                                '" is not configured or missing.', 'warn', NAME);
                         } else {
                             store._validateContextCache[cacheKey] = 'INVALID dimension value "' + ctx[k] + '" for key "' + k + '"';
                             throw new Error(store._validateContextCache[cacheKey]);

@@ -419,8 +419,9 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
             store.validateContext(ctx);
             Y.log = orig;
 
-            A.areEqual('INVALID dimension value "invalid" for key "experiment_ad"', actual.msg, 'error msg');
-            A.areEqual('error', actual.level, 'error level');
+            A.areEqual('INVALID dimension value "invalid" for key "experiment_ad".' +
+                ' Bucket "ad:invalid" is not configured or missing.', actual.msg, 'error msg');
+            A.areEqual('warn', actual.level, 'error level');
             A.areEqual(moduleName, actual.name, 'error module name');
         },
 
