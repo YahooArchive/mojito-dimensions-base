@@ -109,8 +109,10 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
             };
         },
 
-        validateContext: function () {
+        validateContext: function (ctx) {
             // this should trigger RSAddonSuperBundle.hookConfigPlugin though AOP
+            var key = JSON.stringify(ctx);
+            this._validateContextCache[key] = 'VALID';
         },
 
         addResourceVersion: function (res) {
@@ -259,14 +261,6 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
             };
         },
 
-        _should: {
-            error: {
-                'validateContext with invalid dimension value should fail': 'INVALID dimension value "invalid" for key "device"',
-                'validateContext with invalid lang value should fail': 'INVALID dimension value "invalid" for key "lang"',
-                'validateContext with invalid cached value should fail': 'INVALID cached context'
-            }
-        },
-
         'test preloadPackage': function () {
             store._preloadPackage(pkgInfo);
             OA.ownsKey(pkgInfo.pkg.name, store._packagesVisited, 'Packages visited');
@@ -376,64 +370,23 @@ YUI.add('addon-rs-super-bundle-tests', function (Y, NAME) {
             AA.containsItems(expectedPaths, store.config._ycbAppConfig, 'Config plugin _ycbAppConfig');
         },
 
-        'validateContext with invalid dimension should fail with invalid request': function () {
-            var invalidCtx = { experiment_foo: 'BAR'};
-            try {
-                store.validateContext(invalidCtx);
-            } catch (err) {
-                A.areEqual('INVALID dimension key "experiment_foo"', err.message, 'Error message');
-                A.areEqual(400, err.code, 'Error code');
-            }
-        },
-
-        'validateContext with invalid lang value should fail': function () {
-            var ctx = { lang: 'invalid' };
-            store.validateContext(ctx);
-        },
-
-        'validateContext with invalid dimension value should fail': function () {
-            var ctx = { device: 'invalid' };
-            store.validateContext(ctx);
-        },
-
-        'test validateContext with invalid experiment value': function () {
-            var ctx = {
-                    experiment_ad: 'invalid',
-                    lang: 'es-MX',
-                    langs: 'foo',
-                    //should be ignored
-                    foo: null
-                },
-
-                orig = Y.log,
-                actual;
-
-            Y.log = function (msg, level, name) {
-                actual = {
-                    msg: msg,
-                    level: level,
-                    name: name
-                };
-            };
+        'validateContext should ignore invalid experiment dimensions': function () {
+            var ctx = { validCache: 'foo', experiment_foo: 'BAR'},
+                key = JSON.stringify({validCache: 'foo'});
 
             store.validateContext(ctx);
-            Y.log = orig;
-
-            A.areEqual('INVALID dimension value "invalid" for key "experiment_ad".' +
-                ' Bucket "ad:invalid" is not configured or missing.', actual.msg, 'error msg');
-            A.areEqual('warn', actual.level, 'error level');
-            A.areEqual(moduleName, actual.name, 'error module name');
+            A.areEqual('VALID', store._validateContextCache[key], 'Clean cached context');
         },
 
         'test validateContext with cached value': function () {
-            var ctx = { validCache: 'foo' };
-            store.validateContext(ctx);
-            A.isTrue(true, 'No error thrown');
-        },
+            var ctx = { validCache: 'foo' },
+                key = JSON.stringify(ctx);
 
-        'validateContext with invalid cached value should fail': function () {
-            var ctx = { invalidCache: 'foo' };
             store.validateContext(ctx);
+
+            A.areEqual('VALID', store._validateContextCache[key], 'Cached context');
+            console.dir(store._validateContextCache);
+            A.areEqual(2, Object.keys(store._validateContextCache).length, 'Cache size');
         },
 
         'test addResourceVersion with super bundle': function () {

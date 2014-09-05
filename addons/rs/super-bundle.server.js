@@ -159,7 +159,7 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
             this.staticAppConfig = this.store.getStaticAppConfig();
             this.staticHandling = this.staticAppConfig.staticHandling || {};
 
-            this.beforeHostMethod('validateContext', this.validateContext, this);
+            this.beforeHostMethod('validateContext', this.fixContext, this);
             this.beforeHostMethod('_preloadPackage', this._preloadPackage, this);
             this.beforeHostMethod('preloadResourceVersions', this.hookConfigPlugin, this);
             this.beforeHostMethod('addResourceVersion', this.addResourceVersion, this);
@@ -169,81 +169,29 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
         },
 
         /**
-         * Override store (host) validateContext method to ignore
-         * invalid experiment_* dimension values and log an error instead.
-         * It still fails when the dimension does not exist,
-         * i.e. when the super bundle package is missing or misconfigured.
+         * Remove experiment dimensions that are either missing or have an invalid value.
+         * This way the amount of contexts in cache is reduced and it avoids possible
+         * side effects of an invalid context, that is proven to affect the number of
+         * open files when resolving views.
          */
-        validateContext: function (ctx) {
-            var store = this.store,
-                cacheKey = JSON.stringify(ctx),
-                cacheValue,
-                k,
-                parts,
-                p,
-                test,
-                found,
-                error;
-
-            cacheValue = store._validateContextCache[cacheKey];
-            if (cacheValue) {
-                if (cacheValue === 'VALID') {
-                    return;
-                }
-                throw new Error(cacheValue);
-            }
+        fixContext: function (ctx) {
+            var k, v,
+                store = this.store,
+                ignored = {};
 
             for (k in ctx) {
                 if (ctx.hasOwnProperty(k)) {
-                    if (!ctx[k]) {
-                        continue;
-                    }
-                    if ('langs' === k) {
-                        // pseudo-context variable created by our middleware
-                        continue;
-                    }
-                    if (!store._validDims[k]) {
-                        store._validateContextCache[cacheKey] = 'INVALID dimension key "' + k + '"';
-                        error = new Error(store._validateContextCache[cacheKey]);
-                        if (isExperimentDimension(k)) {
-                            error.code = 400; //bad request
-                        }
-                        throw error;
-                    }
-                    // we need to support language fallbacks
-                    if ('lang' === k) {
-                        found = false;
-                        parts = ctx[k].split('-');
-                        for (p = parts.length; p > 0; p -= 1) {
-                            test = parts.slice(0, p).join('-');
-                            if (store._validDims[k][test]) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            store._validateContextCache[cacheKey] = 'INVALID dimension value "' + ctx[k] + '" for key "' + k + '"';
-                            throw new Error(store._validateContextCache[cacheKey]);
-                        }
-                        continue;
-                    }
-                    if (!store._validDims[k][ctx[k]]) {
-                        //this is the only difference with the host method...
-                        if (isExperimentDimension(k)) {
-                            Y.log('INVALID dimension value "' + ctx[k] + '" for key "' + k +
-                                '". Bucket "' + k.replace(EXPERIMENT_DIMENSION_PREFIX, '') + ':' + ctx[k] +
-                                '" is not configured or missing.', 'warn', NAME);
-                        } else {
-                            store._validateContextCache[cacheKey] = 'INVALID dimension value "' + ctx[k] + '" for key "' + k + '"';
-                            throw new Error(store._validateContextCache[cacheKey]);
-                        }
+                    v = ctx[k];
+                    if ((!store._validDims[k] || !store._validDims[k][v]) &&
+                            isExperimentDimension(k)) {
+                        ignored[k] = v;
+                        delete ctx[k];
                     }
                 }
             }
-            store._validateContextCache[cacheKey] = 'VALID';
-            // prevent the wrapped function from executing
-            // but allow the remaining listeners to execute.
-            return new Y.Do.Prevent(NAME);
+            if (Object.keys(ignored).length) {
+                Y.log('Igoring invalid experiment dimensions ' + JSON.stringify(ignored), 'warn', NAME);
+            }
         },
 
         /**
