@@ -1,0 +1,17 @@
+{
+  "name": "mock-app",
+  "description": "My Mojito application",
+  "version": "0.0.1",
+  "author": "",
+  "contributors": [],
+  "dependencies": {
+    "express": "3.x",
+    "mojito": "~0.9",
+    "mojito-shaker": "4.2.x",
+    "mojito-dimensions-base": "0.0.x"
+  },
+  "engines": {
+    "node": ">=0.8"
+  },
+  "main": "./app.js"
+}

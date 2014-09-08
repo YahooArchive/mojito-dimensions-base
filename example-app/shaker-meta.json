@@ -1,0 +1,73 @@
+{
+    "app": {
+        "ADDON-*": {
+            "posl": [
+                "ADDON",
+                "*"
+            ]
+        },
+        "CONTROLLER-*": {
+            "posl": [
+                "CONTROLLER",
+                "*"
+            ]
+        },
+        "CSS-*": {
+            "app": {
+                "css": [
+                    "/static/example-app/assets/index.css",
+                    "/static/shared/assets/index.CSS.css"
+                ]
+            },
+            "mojits": {
+                "Foo": {
+                    "index": {
+                        "css": [
+                            "/static/Foo/assets/index.css",
+                            "/static/Foo/assets/index.CSS.css"
+                        ]
+                    }
+                }
+            },
+            "posl": [
+                "CSS",
+                "*"
+            ]
+        },
+        "VIEW-*": {
+            "posl": [
+                "VIEW",
+                "*"
+            ]
+        },
+        "*": {
+            "app": {
+                "ico": [
+                    "/favicon.ico"
+                ],
+                "css": [
+                    "/static/example-app/assets/index.css"
+                ]
+            },
+            "mojits": {
+                "Bar": {
+                    "index": {
+                        "css": [
+                            "/static/Bar/assets/index.css"
+                        ]
+                    }
+                },
+                "Foo": {
+                    "index": {
+                        "css": [
+                            "/static/Foo/assets/index.css"
+                        ]
+                    }
+                }
+            },
+            "posl": [
+                "*"
+            ]
+        }
+    }
+}
