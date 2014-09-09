@@ -12,10 +12,9 @@ var express = require('express'),
         path: require('path')
     },
 
-middleware = ['./middleware_contextualizer.js'
-    ],
+    middleware = ['./middleware_contextualizer.js'],
 
-app = express();
+    app = express();
 
 // Set the port to listen on.
 app.set('port', process.env.PORT || 80);
@@ -26,7 +25,7 @@ libmojito.extend(app, {
     context: {
         environment: "development"
     },
-    root: libs.path.join(process.cwd(),'/example-app')
+    root: libs.path.join(process.cwd(), '/example-app')
 });
 
 // Load the built-in middleware or any middleware
@@ -34,6 +33,7 @@ libmojito.extend(app, {
 app.use(libmojito.middleware());
 
 middleware.forEach(function (midName) {
+    "use strict";
     var mid,
         midConfig = {
             Y: app.mojito.Y,

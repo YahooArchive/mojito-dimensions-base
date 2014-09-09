@@ -12,8 +12,7 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
     require('colors');
     var lib = {
             path: require('path'),
-            fs: require('fs'),
-            diff: require('diff')
+            fs: require('fs')
         },
         A = YUITest.Assert,
         AA = YUITest.ArrayAssert,
@@ -25,6 +24,7 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
         expectedRoot = lib.path.join(__dirname, 'fixtures', 'expected_markups'),
         actual,
         app,
+        cwd,
         specs = {
             base: 'frame'
         },
@@ -33,10 +33,8 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
             process.shakerCompiler = true;
             var cwd = process.cwd();
 
-            process.chdir(require('path').join(__dirname, '../example-app'));
-            compiler = new ShakerCompiler({
-                // experiment_example: "VIEW"
-            });
+            process.chdir(lib.path.join(__dirname, appRoot));
+            compiler = new ShakerCompiler({});
 
             compiler.compile(function (err) {
                 process.shakerCompiler = false;
@@ -64,13 +62,13 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
 
         name: NAME,
 
-            setUp: function () {
-                app = require(lib.path.join(appRoot, 'app.js'));
-            },
+        setUp: function () {
+            app = require(lib.path.join(appRoot, 'app.js'));
+        },
 
-            tearDown: function () {
-                app = null;
-            }
+        tearDown: function () {
+            app = null;
+        }
     });
 
     /**
@@ -79,7 +77,7 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
     suite.add(new YUITest.TestCase({
         name: 'tests VIEW',
 
-        setUp: function(){
+        setUp: function () {
 
         },
 
@@ -102,41 +100,13 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
                             experiment_example: example
                         }
                     }
-                }, function (err, markup){
+                }, function (err, markup) {
                     console.log("Got VIEW markup, size:" + markup.toString().length);
-                    lib.fs.readFile(lib.path.join(expectedRoot, example + 'markup.html'), function (err, data){
+                    lib.fs.readFile(lib.path.join(expectedRoot, example + 'markup.html'), function (err, data) {
                         markup = processHTML(markup);
-                        try {
-                            A.areEqual(data.toString(), markup, 'test VIEW: VIEW markup not equal');
-                        } catch (err) {
-                            console.log("VIEW failed:\n" + markup);
-                        }
-                        // var one = processHTML(markup);
-                        // var other = processHTML(data.toString());
-
-                        // var thediff = lib.diff.diffChars(one, other);
-
-                        // thediff.forEach(function(part){
-                        //   // green for additions, red for deletions
-                        //   // grey for common parts
-                        //   var color = part.added ? 'green' :
-                        //     part.removed ? 'red' : 'grey';
-                        //   process.stderr.write(part.value[color]);
-                        // });
-
-                        // console.log()
-
-                        // console.log(markup);
-                        // console.log(data.toString());
+                        A.areEqual(markup, data.toString(), 'test VIEW: VIEW markup not equal');
                         self.resume();
                     });
-                    // markup = processHTML(markup);
-                    // lib.fs.writeFile(lib.path.join(expectedRoot, example + 'markup.html'), markup, function (err){
-                    //     if (err) {
-                    //         console.log("[functional test]: ERR writing file");
-                    //     }
-                    //         self.resume();
-                    // });
                 });
             });
             self.wait(150000);
@@ -145,7 +115,6 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
         "testing experiment_example:VIEW, will choose shallower": function () {
             var self = this,
                 example = "VIEW";
-            // have to do it this wany: cant put shaker into setup due to it's async nature...
             shakerCompile(function () {
                 MarkupTest.render({
                     app: app,
@@ -159,46 +128,17 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
                             experiment_example: example
                         }
                     }
-                }, function (err, markup){
+                }, function (err, markup) {
                     console.log("Got VIEW multi markup, size:" + markup.toString().length);
-                    lib.fs.readFile(lib.path.join(expectedRoot, example + 'multimarkup.html'), function (err, data){
+                    lib.fs.readFile(lib.path.join(expectedRoot, example + 'multimarkup.html'), function (err, data) {
                         markup = processHTML(markup);
-                        try {
-                            A.areEqual(data.toString(), markup, 'test VIEW multi: multi VIEW markup not equal');
-                        } catch (err) {
-                            console.log("VIEW multi failed:\n" + markup);
-                        }
-                        // var one = processHTML(markup);
-                        // var other = processHTML(data.toString());
-
-                        // var thediff = lib.diff.diffChars(one, other);
-
-                        // thediff.forEach(function(part){
-                        //   // green for additions, red for deletions
-                        //   // grey for common parts
-                        //   var color = part.added ? 'green' :
-                        //     part.removed ? 'red' : 'grey';
-                        //   process.stderr.write(part.value[color]);
-                        // });
-
-                        // console.log()
-
-                        // console.log(markup);
-                        // console.log(data.toString());
+                        A.areEqual(markup, data.toString(), 'test VIEW multi: multi VIEW markup not equal');
                         self.resume();
                     });
-                    // markup = processHTML(markup);
-                    // lib.fs.writeFile(lib.path.join(expectedRoot, example + 'multimarkup.html'), markup, function (err){
-                    //     if (err) {
-                    //         console.log("[functional test]: ERR writing file");
-                    //         console.log(err);
-                    //     }
-                    //         self.resume();
-                    // });
                 });
             });
             self.wait(150000);
-        },
+        }
 
     }));
 
@@ -209,11 +149,9 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
 
         },
 
-        _should: {
+        _should: {},
 
-        },
-
-         "testing experiment_example:CSS": function () {
+        "testing experiment_example:CSS": function () {
             var self = this,
                 example = "CSS";
             shakerCompile(function () {
@@ -229,21 +167,17 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
                             experiment_example: example
                         }
                     }
-                }, function (err, markup){
+                }, function (err, markup) {
                     console.log("Got CSS markup, size:" + markup.toString().length);
-                    lib.fs.readFile(lib.path.join(expectedRoot, example + 'markup.html'), function (err, data){
+                    lib.fs.readFile(lib.path.join(expectedRoot, example + 'markup.html'), function (err, data) {
                         markup = processHTML(markup);
-                        try {
-                            A.areEqual(data.toString(), markup, 'test CSS: CSS markup not equal');
-                        } catch (err) {
-                            console.log("CSS failed:\n" + markup);
-                        }
+                        A.areEqual(markup, data.toString(), 'test CSS: CSS markup not equal');
                         self.resume();
                     });
                 });
             });
             self.wait(150000);
-        },
+        }
     }));
 
     suite.add(new YUITest.TestCase({
@@ -253,12 +187,9 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
 
         },
 
-        _should: {
+        _should: {},
 
-        },
-
-         "testing experiment_example:ADDON": function () {
-            //
+        "testing experiment_example:ADDON": function () {
             var self = this,
                 example = "ADDON";
             shakerCompile(function () {
@@ -274,9 +205,9 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
                             experiment_example: example
                         }
                     }
-                }, function (err, markup){
+                }, function (err, markup) {
                     console.log("Got ADDON markup, size:" + markup.toString().length);
-                    lib.fs.readFile(lib.path.join(expectedRoot, example + 'markup.html'), function (err, data){
+                    lib.fs.readFile(lib.path.join(expectedRoot, example + 'markup.html'), function (err, data) {
                         markup = processHTML(markup);
                         A.areEqual(data.toString(), markup, 'test experiment ADDON: markup not equal');
                         self.resume();
@@ -284,7 +215,7 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
                 });
             });
             self.wait(150000);
-        },
+        }
     }));
 
     suite.add(new YUITest.TestCase({
@@ -294,11 +225,9 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
 
         },
 
-        _should: {
+        _should: {},
 
-        },
-
-         "testing experiment_example:CONTROLLER": function () {
+        "testing experiment_example:CONTROLLER": function () {
             //
             var self = this,
                 example = "CONTROLLER";
@@ -315,21 +244,17 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
                             experiment_example: example
                         }
                     }
-                }, function (err, markup){
+                }, function (err, markup) {
                     console.log("Got CONTROLLER markup, size:" + markup.toString().length);
-                    lib.fs.readFile(lib.path.join(expectedRoot, example + 'markup.html'), function (err, data){
+                    lib.fs.readFile(lib.path.join(expectedRoot, example + 'markup.html'), function (err, data) {
                         markup = processHTML(markup);
-                        try {
-                            A.areEqual(data.toString(), markup, 'test experiment CONTROLLER: markup not equal');
-                        } catch (err) {
-                            console.log("CONTROLLER failed:\n" + markup);
-                        }
+                        A.areEqual(markup, data.toString(), 'test experiment CONTROLLER: markup not equal');
                         self.resume();
                     });
                 });
             });
             self.wait(150000);
-        },
+        }
     }));
 
     suite.add(new YUITest.TestCase({
@@ -339,14 +264,9 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
 
         },
 
-        _should: {
-            // error: {
-            //     'testing experiment_example:BINDER': 'INVALID dimension value "BINDER" for key "experiment_example"',
-            // }
-        },
+        _should: {},
 
-         "testing experiment_example:BINDER": function () {
-            //
+        "testing experiment_example:BINDER": function () {
             var self = this,
                 example = "BINDER";
             shakerCompile(function () {
@@ -362,9 +282,9 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
                             experiment_example: example
                         }
                     }
-                }, function (err, markup){
+                }, function (err, markup) {
                     console.log("Got BINDER markup, size:" + markup.toString().length);
-                    lib.fs.readFile(lib.path.join(expectedRoot, example + 'markup.html'), function (err, data){
+                    lib.fs.readFile(lib.path.join(expectedRoot, example + 'markup.html'), function (err, data) {
                         markup = processHTML(markup);
                         A.areEqual(data.toString(), markup, 'test experiment BINDER: markup not equal');
                         self.resume();
@@ -372,57 +292,8 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
                 });
             });
             self.wait(150000);
-        },
+        }
     }));
-
-    // suite.add(new YUITest.TestCase({
-    //     name: 'tests CONFIG',
-
-    //     setUp: function () {
-
-    //     },
-
-    //     _should: {
-
-    //     },
-
-    //      "testing experiment_example:CONFIG": function () {
-    //         //
-    //         var self = this,
-    //             example = "CSS";
-    //         shakerCompile(function () {
-    //             MarkupTest.render({
-    //                 app: app,
-    //                 base: 'frame',
-    //                 context: {
-    //                     experiment_example: example
-    //                 },
-    //                 req: {
-    //                     url: "/",
-    //                     context: {
-    //                         experiment_example: example
-    //                     }
-    //                 }
-    //             }, function (err, markup){
-    //                 console.log("Got CONFIG markup, size:" + markup.toString().length);
-    //                 // lib.fs.readFile(lib.path.join(expectedRoot, example + 'markup.html'), function (err, data){
-    //                 //     markup = processHTML(markup);
-    //                 //     A.areEqual(data.toString(), markup, 'markup not equal');
-    //                 //     self.resume();
-    //                 // });
-    //                 markup = processHTML(markup);
-    //                 lib.fs.writeFile(lib.path.join(expectedRoot, example + 'markup.html'), markup, function (err){
-    //                     if (err) {
-    //                         console.log("[functional test]: ERR writing file");
-    //                         console.log(err);
-    //                     }
-    //                         self.resume();
-    //                 });
-    //             });
-    //         });
-    //         self.wait(150000);
-    //     },
-    // }));
 
     YUITest.TestRunner.add(suite);
 
@@ -432,4 +303,3 @@ YUI.add('addon-rs-super-bundle-functional-tests', function (Y, NAME) {
         'mojito-markup-test'
     ]
 });
-

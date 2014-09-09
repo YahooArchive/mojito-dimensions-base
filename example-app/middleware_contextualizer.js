@@ -23,5 +23,5 @@ module.exports = function (midConfig) {
             req.context[key.toLowerCase()] = value;
         }
         next();
-    }
-}
+    };
+};
