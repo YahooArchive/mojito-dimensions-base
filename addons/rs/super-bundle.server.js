@@ -160,6 +160,7 @@ YUI.add('addon-rs-super-bundle', function (Y, NAME) {
             this.staticHandling = this.staticAppConfig.staticHandling || {};
 
             this.beforeHostMethod('validateContext', this.fixContext, this);
+            this.beforeHostMethod('getAppConfig', this.fixContext, this);
             this.beforeHostMethod('_preloadPackage', this._preloadPackage, this);
             this.beforeHostMethod('preloadResourceVersions', this.hookConfigPlugin, this);
             this.beforeHostMethod('addResourceVersion', this.addResourceVersion, this);
