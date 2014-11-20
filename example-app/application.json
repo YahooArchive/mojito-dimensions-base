@@ -1,0 +1,22 @@
+[
+    {
+        "settings": [ "runtime:server" ],
+        "specs": {
+    		"frame":{
+                "type": "ShakerHTMLFrameMojit",
+                "config": {
+                    "deploy": true,
+                    "child": {
+                        "type":"Foo"
+                    }
+                }
+    		}
+    	}
+    },
+    {
+        "settings": [ "environment:development" ],
+        "staticHandling": {
+            "forceUpdate": true
+        }
+    }
+]
